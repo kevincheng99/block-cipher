@@ -154,9 +154,9 @@ BOOST_AUTO_TEST_CASE(test_encrypt1) {
   string ciphertext = myrsa -> encrypt(plaintext);
 
   // print the ciphertext and its length
-  cerr << "plaintext: " << plaintext << endl;
-  cerr << "ciphertext: " << endl << ciphertext << endl;
-  cerr << "ciphertext length: " << ciphertext.length() << endl;
+  //cerr << "plaintext: " << plaintext << endl;
+  //cerr << "ciphertext: " << endl << ciphertext << endl;
+  //cerr << "ciphertext length: " << ciphertext.length() << endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_encrypt2) {
@@ -193,6 +193,28 @@ BOOST_AUTO_TEST_CASE(test_encrypt3) {
 
   // encrytion by the public key
   string plaintext(300, 'k');
+  string ciphertext = myrsa -> encrypt(plaintext);
+
+  // check if the ciphertext is expected
+  BOOST_CHECK_EQUAL(ciphertext, "");
+}
+
+BOOST_AUTO_TEST_CASE(test_encrypt4) {
+  /**
+   * test of RSA encryption: plaintext length is at its maximum length, which is
+   * RSA_size(RSA_key) - 42 from the official OpenSSL documentation, when doing
+   * RSA_PKSC1_OAEP_PADDING
+   */
+
+  // initialize the cipher interface to RSA
+  CipherInterface* myrsa = new RSA_433();
+
+  // set key
+  bool is_public_key = true;
+  myrsa -> setKey("pubkey.pem", is_public_key);
+
+  // encrytion by the public key
+  string plaintext(215, 'k');
   string ciphertext = myrsa -> encrypt(plaintext);
 
   // check if the ciphertext is expected
@@ -270,4 +292,36 @@ BOOST_AUTO_TEST_CASE(test_decrypt3) {
   BOOST_CHECK_EQUAL(decrypted_ciphertext, "");
 }
 
+BOOST_AUTO_TEST_CASE(test_decrypt4) {
+  /**
+   * test of RSA decryption: 214 bytes
+   * from the OpenSSL documentation, the plaintext size must be less than
+   * RSA_size(RSA_key) - 41 when using RSA_PKSC1_OAEP_PADDING
+   * since our key is 256 bytes, then, we should set the maxim size of plaintext
+   * as 256 - 42 = 214
+   */
 
+  // initialize the cipher interface to RSA
+  CipherInterface* myrsa = new RSA_433();
+
+  // set the public key
+  bool is_public_key = true;
+  myrsa -> setKey("pubkey.pem", is_public_key);
+
+  // encrytion by the public key
+  string plaintext(214, 'k');
+  string ciphertext = myrsa -> encrypt(plaintext);
+
+  // set the private key
+  is_public_key = false;
+  myrsa -> setKey("privkey.pem", is_public_key);
+
+  // decrypt the ciphertext
+  string decrypted_ciphertext = myrsa -> decrypt(ciphertext);
+
+  // check if the decryption works
+  BOOST_CHECK_EQUAL(decrypted_ciphertext, plaintext);
+
+  //cerr << "decrypted_ciphertext: " << decrypted_ciphertext << endl;
+  //cerr << "plaintext           : " << plaintext << endl;
+}

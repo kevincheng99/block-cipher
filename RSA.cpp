@@ -87,12 +87,16 @@ std::string RSA_433::encrypt(const std::string& plaintext) {
     return "";
   }
 
-  // check if the plaintext is longer than the key size
-  unsigned int byte_key_length = bit_key_length / 8;
-  if (plaintext.length() > byte_key_length) {
+  // check if the plaintext is longer than the key size - 42
+  // when using the RSA_PKSC1_OAEP_PADDING, the maxium size of plaintext block
+  // is RSA_size(key) - 42
+  //unsigned int byte_key_length = bit_key_length / 8;
+  unsigned int maxim_plaintext_block_size = bit_key_length / 8 - 42;
+  if (plaintext.length() > maxim_plaintext_block_size) {
     cerr << "ERROR: plaintext block is longer than the key length" << endl;
     cerr << "plaintext length: " << plaintext.length() << " bytes" << endl;
-    cerr << "key length: " << byte_key_length << " bytes" << endl;
+    cerr << "maximum block size: " << maxim_plaintext_block_size;
+    cerr << " bytes" << endl;
     return "";
   }
 
