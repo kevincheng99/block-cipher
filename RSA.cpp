@@ -3,6 +3,17 @@
  * implmentation is modifed to satisfy the project requirement and our cipher
  * interface.
  *
+ * test result summary
+ * from the testing of plaintext block size, due to RSA_PKCS1_OAEP_PADDING, the
+ * maximum plaintext block size is 214 bytes. After padding, it is 256 bytes to
+ * match the size of public or private key. For decryption with
+ * RSA_PKCS1_OAEP_PADDING, the ciphertext of 256 bytes is decrypted and
+ * processed to remove the padding.
+ *
+ * Improvement:
+ * The random number generator must be seeded prior to calling
+ * RSA_public_encrypt().
+ *
  * Date: April 26, 2014
  */
 
@@ -11,7 +22,7 @@
 RSA_433::RSA_433(): pem_key(NULL) {
 }
 
-const unsigned int RSA_433::bit_key_length = 2048;
+//const unsigned int RSA_433::bit_key_length = 2048;
 
 /**
  * Sets the key to use.
@@ -75,6 +86,15 @@ bool RSA_433::setKey(const std::string& key_file, bool is_public_key) {
 
 /**	
  * Encrypts a plaintext string
+ *
+ * RSA_public_encrypt() encrypts the flen bytes at from (usually a session key)
+ * using the public key rsa and stores the ciphertext in to. to must point to
+ * RSA_size(rsa) bytes of memory. 
+ *
+ * Improvement:
+ * The random number generator must be seeded prior to calling
+ * RSA_public_encrypt().
+ *
  * @param plaintext - the plaintext string
  * @return - the encrypted ciphertext string
  */
@@ -91,7 +111,10 @@ std::string RSA_433::encrypt(const std::string& plaintext) {
   // when using the RSA_PKSC1_OAEP_PADDING, the maxium size of plaintext block
   // is RSA_size(key) - 42
   //unsigned int byte_key_length = bit_key_length / 8;
-  unsigned int maxim_plaintext_block_size = bit_key_length / 8 - 42;
+  //unsigned int maxim_plaintext_block_size = bit_key_length / 8 - 42;
+  unsigned int maxim_plaintext_block_size = RSA_size(pem_key) - 42;
+
+  //if (plaintext.length() > RSA_size(pem_key)) {
   if (plaintext.length() > maxim_plaintext_block_size) {
     cerr << "ERROR: plaintext block is longer than the key length" << endl;
     cerr << "plaintext length: " << plaintext.length() << " bytes" << endl;
@@ -125,7 +148,9 @@ std::string RSA_433::encrypt(const std::string& plaintext) {
       reinterpret_cast<unsigned char*>(plaintext_buffer);
 
   // initialize the ciphertext buffer
-  unsigned char uciphertext[bit_key_length];
+  //unsigned char uciphertext[bit_key_length];
+  unsigned char uciphertext[RSA_size(pem_key)];
+
   memset(uciphertext, 0, sizeof(uciphertext));
 
   // encrypt the plaintext block
@@ -138,7 +163,7 @@ std::string RSA_433::encrypt(const std::string& plaintext) {
   // check if the encryption is successful
   if (size_of_encrypted_data < 0) {
     // initialize a error buffer
-    char error_buffer[256];
+    char error_buffer[130];
     memset(error_buffer, 0, sizeof(error_buffer));
 
     // register the error strings for all libcrypto functions
@@ -185,7 +210,9 @@ std::string RSA_433::decrypt(const std::string& ciphertext) {
   }
 
   // check if the ciphertext is longer than the key size
-  unsigned int byte_key_length = bit_key_length / 8;
+  //unsigned int byte_key_length = bit_key_length / 8;
+  unsigned int byte_key_length = RSA_size(pem_key);
+
   if (ciphertext.length() > byte_key_length) {
     cerr << "ERROR: ciphertext block is longer than the key length" << endl;
     cerr << "ciphertext length: " << ciphertext.length() << " bytes" << endl;
@@ -217,7 +244,9 @@ std::string RSA_433::decrypt(const std::string& ciphertext) {
       reinterpret_cast<unsigned char*>(ciphertext_buffer);
 
   // initialize the decrypted ciphertext buffer 
-  unsigned char decrypted_ciphertext[bit_key_length];
+  //unsigned char decrypted_ciphertext[bit_key_length];
+  unsigned char decrypted_ciphertext[RSA_size(pem_key)];
+
   memset(decrypted_ciphertext, 0, sizeof(decrypted_ciphertext));
 
   // decrypt the ciphertext by the private key in the PEM format

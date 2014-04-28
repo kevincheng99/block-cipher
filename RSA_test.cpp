@@ -125,17 +125,17 @@ BOOST_AUTO_TEST_CASE(test_setKey5) {
   system("mv privkey.pem.sav privkey.pem");
 }
 
-BOOST_AUTO_TEST_CASE(test_keylength) {
-  /**
-   * test the key length
-   */
+//BOOST_AUTO_TEST_CASE(test_keylength) {
+/**
+ * test the key length
+ */
 
-  // initialize RSA
-  RSA_433 myrsa;
+//// initialize RSA
+//RSA_433 myrsa;
 
-  // check the key length
-  BOOST_CHECK_EQUAL(myrsa.bit_key_length, 2048);
-}
+//// check the key length
+//BOOST_CHECK_EQUAL(myrsa.bit_key_length, 2048);
+//}
 
 BOOST_AUTO_TEST_CASE(test_encrypt1) {
   /**
@@ -204,6 +204,8 @@ BOOST_AUTO_TEST_CASE(test_encrypt4) {
    * test of RSA encryption: plaintext length is at its maximum length, which is
    * RSA_size(RSA_key) - 42 from the official OpenSSL documentation, when doing
    * RSA_PKSC1_OAEP_PADDING
+   *
+   * the error message about the padding error was inaccurate due to BOOST lib?
    */
 
   // initialize the cipher interface to RSA
@@ -252,7 +254,7 @@ BOOST_AUTO_TEST_CASE(test_decrypt1) {
   //cerr << "decrypted_ciphertext: " << decrypted_ciphertext << endl;
   //cerr << "plaintext           : " << plaintext << endl;
 }
- 
+
 BOOST_AUTO_TEST_CASE(test_decrypt2) {
   /**
    * test of RSA decryption: empty ciphertext
@@ -280,6 +282,7 @@ BOOST_AUTO_TEST_CASE(test_decrypt3) {
 
   // initialize the cipher interface to RSA
   CipherInterface* myrsa = new RSA_433();
+
   // set the private key
   bool is_public_key = false;
   myrsa -> setKey("privkey.pem", is_public_key);
@@ -321,7 +324,191 @@ BOOST_AUTO_TEST_CASE(test_decrypt4) {
 
   // check if the decryption works
   BOOST_CHECK_EQUAL(decrypted_ciphertext, plaintext);
-
-  //cerr << "decrypted_ciphertext: " << decrypted_ciphertext << endl;
-  //cerr << "plaintext           : " << plaintext << endl;
 }
+
+BOOST_AUTO_TEST_CASE(test_plaintext_block_size1) {
+  /**
+   * test of RSA encryption: test padding
+   * plaintext block size 1 byte
+   */
+
+  // initialize the cipher interface to RSA
+  CipherInterface* myrsa = new RSA_433();
+
+  // set public key
+  bool is_public_key = true;
+  myrsa -> setKey("pubkey.pem", is_public_key);
+
+  // encrytion by the public key
+  string plaintext(1, 'k');
+  string ciphertext = myrsa -> encrypt(plaintext);
+
+  // set the private key
+  is_public_key = false;
+  myrsa -> setKey("privkey.pem", is_public_key);
+
+  // decryption by the private key
+  string decrypted_ciphertext = myrsa -> decrypt(ciphertext);
+
+  // check the decryption result against the plaintext
+  BOOST_CHECK_EQUAL(decrypted_ciphertext, plaintext);
+}
+
+BOOST_AUTO_TEST_CASE(test_plaintext_block_size2) {
+  /**
+   * test of RSA encryption: test padding
+   * plaintext block size 100 byte
+   */
+
+  // initialize the cipher interface to RSA
+  CipherInterface* myrsa = new RSA_433();
+
+  // set public key
+  bool is_public_key = true;
+  myrsa -> setKey("pubkey.pem", is_public_key);
+
+  // encrytion by the public key
+  string plaintext(100, 'k');
+  string ciphertext = myrsa -> encrypt(plaintext);
+
+  // set the private key
+  is_public_key = false;
+  myrsa -> setKey("privkey.pem", is_public_key);
+
+  // decryption by the private key
+  string decrypted_ciphertext = myrsa -> decrypt(ciphertext);
+
+  // check the decryption result against the plaintext
+  BOOST_CHECK_EQUAL(decrypted_ciphertext, plaintext);
+}
+
+BOOST_AUTO_TEST_CASE(test_plaintext_block_size3) {
+  /**
+   * test of RSA encryption: test padding
+   * plaintext block size 214 byte
+   * critical point: RSA_size(RSA) - 41: 214 and 215
+   */
+
+  // initialize the cipher interface to RSA
+  CipherInterface* myrsa = new RSA_433();
+
+  // set public key
+  bool is_public_key = true;
+  myrsa -> setKey("pubkey.pem", is_public_key);
+
+  // encrytion by the public key
+  string plaintext(214, 'k');
+  string ciphertext = myrsa -> encrypt(plaintext);
+
+  // set the private key
+  is_public_key = false;
+  myrsa -> setKey("privkey.pem", is_public_key);
+
+  // decryption by the private key
+  string decrypted_ciphertext = myrsa -> decrypt(ciphertext);
+
+  // check the decryption result against the plaintext
+  BOOST_CHECK_EQUAL(decrypted_ciphertext, plaintext);
+}
+
+BOOST_AUTO_TEST_CASE(test_plaintext_block_size4) {
+  /**
+   * test of RSA encryption: test padding
+   * plaintext block size 215 byte
+   * critical point: RSA_size(RSA) - 41: 214 and 215
+   */
+
+  // initialize the cipher interface to RSA
+  CipherInterface* myrsa = new RSA_433();
+
+  // set public key
+  bool is_public_key = true;
+  myrsa -> setKey("pubkey.pem", is_public_key);
+
+  // encrytion by the public key
+  string plaintext(215, 'k');
+  string ciphertext = myrsa -> encrypt(plaintext);
+
+  // set the private key
+  is_public_key = false;
+  myrsa -> setKey("privkey.pem", is_public_key);
+
+  // decryption by the private key
+  string decrypted_ciphertext = myrsa -> decrypt(ciphertext);
+
+  // check the decryption result against the plaintext
+  BOOST_CHECK(decrypted_ciphertext.compare(plaintext) != 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_plaintext_block_size5) {
+  /**
+   * test of RSA encryption: test padding
+   * plaintext block size 256 byte same as the key size
+   */
+
+  // initialize the cipher interface to RSA
+  CipherInterface* myrsa = new RSA_433();
+
+  // set public key
+  bool is_public_key = true;
+  myrsa -> setKey("pubkey.pem", is_public_key);
+
+  // encrytion by the public key
+  string plaintext(256, 'k');
+  string ciphertext = myrsa -> encrypt(plaintext);
+
+  // set the private key
+  is_public_key = false;
+  myrsa -> setKey("privkey.pem", is_public_key);
+
+  // decryption by the private key
+  string decrypted_ciphertext = myrsa -> decrypt(ciphertext);
+
+  // check the decryption result against the plaintext
+  BOOST_CHECK(decrypted_ciphertext.compare(plaintext) != 0);
+}
+
+/**
+ * result summary
+ * from the testing of plaintext block size, due to RSA_PKCS1_OAEP_PADDING, the
+ * maximum plaintext block size is 214 bytes. After padding, it is 256 bytes to
+ * match the size of public or private key. For decryption with
+ * RSA_PKCS1_OAEP_PADDING, the ciphertext of 256 bytes is decrypted and
+ * processed to remove the padding.
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

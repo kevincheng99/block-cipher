@@ -26,7 +26,7 @@ class RSA_433: public CipherInterface
 
   /* The public members */
  public:
-  static const unsigned int bit_key_length;
+  //static const unsigned int bit_key_length;
 
   /**
    * The default constructor
