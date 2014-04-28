@@ -1,5 +1,10 @@
 #include "DES.h"
 
+#define ENC 1
+#define DEC 0
+
+#include <iostream>
+
 /**
  * Sets the key to use
  * @param key - the key to use
@@ -88,7 +93,60 @@ string DES::encrypt(const string& plaintext)
 	//9. Convert the string (e.g. bytes[8]) to a C++ string.
 	//10.Return the C++ string
 	
-	return "";
+	string ptext = plaintext;
+	
+	while (ptext.size() < 8)
+	{
+		ptext.append("0");
+	}
+	
+	cout << "ptext :" << ptext << endl;
+	
+	DES_LONG block[2];
+	
+	//Convert C++ string to c-string
+	//const char* cstrText1 = ptext.substr(0,4).c_str();
+	//const char* cstrText2 = ptext.substr(4,4).c_str();
+  //printf("%p\n", cstrText1);
+  //printf("%p\n", cstrText2);
+
+  //char cstr1[4], cstr2[4];
+	//strncpy (cstr1, cstrText1, sizeof(cstrText1));
+	//strncpy (cstr2, cstrText2, sizeof(cstrText2));
+
+  char cstr1[4];
+  char cstr2[4];
+	
+  ptext.copy(cstr1, 4, 0);
+  cstr2[4] = '\0';
+
+  ptext.copy(cstr2, 4, 4);
+  cstr2[4] = '\0';
+
+  cout << cstr1 << cstr2 << endl << endl;
+
+	unsigned char * ucstr1 = reinterpret_cast<unsigned char *>(cstr1);
+	unsigned char * ucstr2 = reinterpret_cast<unsigned char *>(cstr2);
+	
+	//Convert first 4 chars into Long Int
+	
+	block[0] = ctol(ucstr1);
+	block[1] = ctol(ucstr2);
+	
+	//Encrypt
+	
+	des_encrypt1(block,key,ENC);
+	
+	//Convert long to c string
+	unsigned char txtText[8];
+	
+	ltoc(block[0], txtText);
+	ltoc(block[1], txtText + 4);
+	
+	//Convert c string to C++ string
+	string convertcstr(reinterpret_cast<char *>(txtText));
+	
+	return convertcstr;
 }
 
 /**
@@ -100,6 +158,37 @@ string DES::decrypt(const string& ciphertext)
 {
 	//LOGIC:
 	// Same logic as encrypt(), except in step 5. decrypt instead of encrypting
+	
+	DES_LONG block[2];
+	
+	//Convert C++ string to c-string
+	const char* cstrText1 = ciphertext.substr(0,4).c_str();
+	const char* cstrText2 = ciphertext.substr(4,4).c_str();
+	
+	char cstr1[4], cstr2[4];
+	strncpy (cstr1, cstrText1, sizeof(cstrText1));
+	strncpy (cstr2, cstrText2, sizeof(cstrText2));
+	
+	unsigned char * ucstr1 = reinterpret_cast<unsigned char *>(cstr1);
+	unsigned char * ucstr2 = reinterpret_cast<unsigned char *>(cstr2);
+	
+	//Convert first 4 chars into Long Int
+	block[0] = ctol(ucstr1);
+	block[1] = ctol(ucstr2);
+	
+	//Decrypt
+	des_encrypt1(block,key,DEC);
+	
+	//Convert Long back to c string
+	unsigned char txtText[8];
+	
+	ltoc(block[0], txtText);
+	ltoc(block[1], txtText + 4);
+	
+	//convert c string to C++ string
+	string convertcstr(reinterpret_cast<char *>(txtText));
+	
+	return convertcstr;
 }
 
 /**
