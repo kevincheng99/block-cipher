@@ -141,6 +141,7 @@ std::string RSA_433::encrypt(const std::string& plaintext) {
 
   // fill the buffer with plaintext
   plaintext.copy(plaintext_buffer, plaintext_block_size);
+  plaintext_buffer[plaintext_block_size] = '\0';
 
   // have a unsigned char pointer to the plaintext buffer
   //unsigned char* uplaintext = (unsigned char*) plaintext_buffer;
@@ -238,6 +239,7 @@ std::string RSA_433::decrypt(const std::string& ciphertext) {
 
   // fill the buffer with the ciphertext
   ciphertext.copy(ciphertext_buffer, ciphertext_block_size);
+  ciphertext_buffer[ciphertext_block_size] = '\0';
 
   // have a unsigned pointer point to the plaintext buffer
   unsigned char* uciphertext =
