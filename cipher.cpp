@@ -225,7 +225,7 @@ int main(int argc, char** argv)
 
       //cout << number_of_padding << endl;
 
-      // remove padding
+      // remove padding or preserve valid texts
       size_t length = decrypted_ciphertext.length() - number_of_padding;
       string plaintext = decrypted_ciphertext.substr(0, length);
 
