@@ -69,24 +69,6 @@ int main(int argc, char** argv)
    */
 
   // DES encryption or decryption
-  //if (strcmp("DES", argv[kCipherName]) == 0) {
-    /* Set the encryption key
-     * A valid key comprises 16 hexidecimal
-     * characters. Below is one example.
-     * Your program should take input from
-     * command line.
-     */
- //   cipher->setKey("0123456789abcdef");
-
-    /* Perform encryption */
-    //string cipherText = cipher->encrypt("hello world");
-
-    /* Perform decryption */
-    //cipher->decrypt(cipherText);	
-  //}
-
-  
-  // DES encryption or decryption
   if (strcmp("DES", argv[kCipherName]) == 0) {
     if (strcmp("ENC", argv[kEncryptionOrDecryption]) == 0) {
       // initialize input file stream object

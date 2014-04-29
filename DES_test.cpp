@@ -35,9 +35,9 @@ BOOST_AUTO_TEST_CASE(test_decryption1) {
   BOOST_CHECK_EQUAL(decrypted_ciphertext, plaintext);
 
   // print info
-  cout << "decrypted ciphertext: " << decrypted_ciphertext << endl;
-  cout << "decrypted ciphertext length: " << decrypted_ciphertext.length();
-  cout << endl;
+  //cout << "decrypted ciphertext: " << decrypted_ciphertext << endl;
+  //cout << "decrypted ciphertext length: " << decrypted_ciphertext.length();
+  //cout << endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_decryption2) {
@@ -60,9 +60,9 @@ BOOST_AUTO_TEST_CASE(test_decryption2) {
   BOOST_CHECK_EQUAL(decrypted_ciphertext, plaintext);
 
   // print info
-  cout << "decrypted ciphertext: " << decrypted_ciphertext << endl;
-  cout << "decrypted ciphertext length: " << decrypted_ciphertext.length();
-  cout << endl;
+  //cout << "decrypted ciphertext: " << decrypted_ciphertext << endl;
+  //cout << "decrypted ciphertext length: " << decrypted_ciphertext.length();
+  //cout << endl;
 }
 
 BOOST_AUTO_TEST_CASE(test_decryption3) {
@@ -74,6 +74,31 @@ BOOST_AUTO_TEST_CASE(test_decryption3) {
 
   // set plaintext
   string plaintext = "hello world, this is kevin!";
+
+  // DES encryption
+  string ciphertext = mydes.encrypt(plaintext);
+
+  // DES decryption
+  string decrypted_ciphertext = mydes.decrypt(ciphertext);
+
+  // check if the decrypted ciphertext is the same as plaintext
+  BOOST_CHECK(decrypted_ciphertext.compare(plaintext) != 0);
+
+  // print info
+  //cout << "decrypted ciphertext: " << decrypted_ciphertext << endl;
+  //cout << "decrypted ciphertext length: " << decrypted_ciphertext.length();
+  //cout << endl;
+}
+
+BOOST_AUTO_TEST_CASE(test_decryption4) {
+  // initialize the DES cipher object
+  DES mydes;
+
+  // set encryption and decryption key
+  mydes.setKey("0123456789abcdef");
+
+  // set plaintext
+  string plaintext = "1234567";
 
   // DES encryption
   string ciphertext = mydes.encrypt(plaintext);
