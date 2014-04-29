@@ -100,53 +100,68 @@ string DES::encrypt(const string& plaintext)
 		ptext.append("0");
 	}
 	
-	cout << "ptext :" << ptext << endl;
+	
 	
 	DES_LONG block[2];
 	
 	//Convert C++ string to c-string
-	//const char* cstrText1 = ptext.substr(0,4).c_str();
-	//const char* cstrText2 = ptext.substr(4,4).c_str();
-  //printf("%p\n", cstrText1);
-  //printf("%p\n", cstrText2);
+	char cstr1[4];
+	char cstr2[4];
 
-  //char cstr1[4], cstr2[4];
-	//strncpy (cstr1, cstrText1, sizeof(cstrText1));
-	//strncpy (cstr2, cstrText2, sizeof(cstrText2));
+	ptext.copy(cstr1, 4, 0);
+	cstr1[4] = '\0';
 
-  char cstr1[4];
-  char cstr2[4];
-	
-  ptext.copy(cstr1, 4, 0);
-  cstr2[4] = '\0';
+	ptext.copy(cstr2, 4, 4);
+	cstr2[4] = '\0';
 
-  ptext.copy(cstr2, 4, 4);
-  cstr2[4] = '\0';
+	unsigned char ucstr1[4];
+	memset(ucstr1, 0, sizeof(ucstr1));
 
-  cout << cstr1 << cstr2 << endl << endl;
+	for (int i = 0; i < sizeof(cstr1); i++) {
+	ucstr1[i] = cstr1[i];
+	}
+	ucstr1[sizeof(cstr1)] = '\0';
 
-	unsigned char * ucstr1 = reinterpret_cast<unsigned char *>(cstr1);
-	unsigned char * ucstr2 = reinterpret_cast<unsigned char *>(cstr2);
-	
+	unsigned char ucstr2[4];
+	memset(ucstr2, 0, sizeof(ucstr2));
+
+	for (int i = 0; i < sizeof(cstr2); i++) {
+	ucstr2[i] = cstr2[i];
+	}
+	ucstr2[sizeof(cstr2)] = '\0';
+  
+
 	//Convert first 4 chars into Long Int
-	
 	block[0] = ctol(ucstr1);
 	block[1] = ctol(ucstr2);
 	
 	//Encrypt
-	
 	des_encrypt1(block,key,ENC);
 	
-	//Convert long to c string
-	unsigned char txtText[8];
 	
-	ltoc(block[0], txtText);
-	ltoc(block[1], txtText + 4);
+	//Convert long to c string
+	unsigned char txtText1[4];
+	unsigned char txtText2[4];
+	
+	ltoc(block[0], txtText1);
+	ltoc(block[1], txtText2);
 	
 	//Convert c string to C++ string
-	string convertcstr(reinterpret_cast<char *>(txtText));
+	string convertcstr1 = "";
+	for (int i = 0; i < sizeof(txtText1); i++) {
+	convertcstr1.push_back(txtText1[i]); 
+	}
+
+	string convertcstr2 = "";
+	for (int i = 0; i < sizeof(txtText2); i++) {
+	convertcstr2.push_back(txtText2[i]); 
+	}
+
+  //cout << "ciphertext: " << convertcstr1 + convertcstr2 << endl;
 	
-	return convertcstr;
+	//cout << "decrypt test: " << decrypt(convertcstr1 + convertcstr2) << "|" << endl;
+	
+	return convertcstr1 + convertcstr2;
 }
 
 /**
@@ -162,15 +177,38 @@ string DES::decrypt(const string& ciphertext)
 	DES_LONG block[2];
 	
 	//Convert C++ string to c-string
-	const char* cstrText1 = ciphertext.substr(0,4).c_str();
+	/*const char* cstrText1 = ciphertext.substr(0,4).c_str();
 	const char* cstrText2 = ciphertext.substr(4,4).c_str();
 	
 	char cstr1[4], cstr2[4];
 	strncpy (cstr1, cstrText1, sizeof(cstrText1));
 	strncpy (cstr2, cstrText2, sizeof(cstrText2));
+	*/
 	
-	unsigned char * ucstr1 = reinterpret_cast<unsigned char *>(cstr1);
-	unsigned char * ucstr2 = reinterpret_cast<unsigned char *>(cstr2);
+	char cstr1[4];
+	char cstr2[4];
+
+	ciphertext.copy(cstr1, 4, 0);
+	cstr2[4] = '\0';
+
+	ciphertext.copy(cstr2, 4, 4);
+	cstr2[4] = '\0';
+	
+	unsigned char ucstr1[4];
+	memset(ucstr1, 0, sizeof(ucstr1));
+
+	for (int i = 0; i < sizeof(cstr1); i++) {
+	ucstr1[i] = cstr1[i];
+	}
+	ucstr1[sizeof(cstr1)] = '\0';
+
+	unsigned char ucstr2[4];
+	memset(ucstr2, 0, sizeof(ucstr2));
+
+	for (int i = 0; i < sizeof(cstr2); i++) {
+	ucstr2[i] = cstr2[i];
+	}
+	ucstr2[sizeof(cstr2)] = '\0';
 	
 	//Convert first 4 chars into Long Int
 	block[0] = ctol(ucstr1);
@@ -180,15 +218,26 @@ string DES::decrypt(const string& ciphertext)
 	des_encrypt1(block,key,DEC);
 	
 	//Convert Long back to c string
-	unsigned char txtText[8];
+	unsigned char txtText1[4];
+	unsigned char txtText2[4];
 	
-	ltoc(block[0], txtText);
-	ltoc(block[1], txtText + 4);
+	ltoc(block[0], txtText1);
+	ltoc(block[1], txtText2);
 	
-	//convert c string to C++ string
-	string convertcstr(reinterpret_cast<char *>(txtText));
+	//Convert c string to C++ string
+	string convertcstr1 = "";
+	for (int i = 0; i < sizeof(txtText1); i++) {
+	convertcstr1.push_back(txtText1[i]); 
+	}
+
+	string convertcstr2 = "";
+	for (int i = 0; i < sizeof(txtText2); i++) {
+	convertcstr2.push_back(txtText2[i]); 
+	}
 	
-	return convertcstr;
+	//cout << "length of plaintext: " << test.length() << endl;
+	
+	return convertcstr1 + convertcstr2;
 }
 
 /**
