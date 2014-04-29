@@ -95,7 +95,7 @@ string DES::encrypt(const string& plaintext)
 	
 	string ptext = plaintext;
 	
-  int number_of_padding = 0;
+  size_t number_of_padding = 0;
 
 	while (ptext.size() < 8)
 	{
@@ -113,7 +113,7 @@ string DES::encrypt(const string& plaintext)
    * it's important to do the bound checking when dealing with end of string
    * we will remove the padding in the cipher.cpp
    */
-  if (number_of_padding > 0) {
+  if (number_of_padding > 0 && number_of_padding < 8) {
     size_t last_index = ptext.length() - 1;
     ptext.at(last_index) = number_of_padding_char;
   }

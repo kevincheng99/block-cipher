@@ -210,6 +210,26 @@ int main(int argc, char** argv)
         decrypted_ciphertext += cipher -> decrypt(block);
       }
 
+      /**
+       * remove paddings
+       */
+      // extract the number of paddings from the last element of decrypted
+      // ciphertext
+      size_t last_index = decrypted_ciphertext.length() - 1;
+      size_t number_of_padding = decrypted_ciphertext.at(last_index) - '0';
+
+      // screen the number of padding
+      if (number_of_padding <= 0 || number_of_padding >= 8) {
+        number_of_padding = 0;
+      }
+
+      //cout << number_of_padding << endl;
+
+      // remove padding
+      size_t length = decrypted_ciphertext.length() - number_of_padding;
+      string plaintext = decrypted_ciphertext.substr(0, length);
+
+
       //cout << decrypted_ciphertext;
       //cout << decrypted_ciphertext.length() << endl;
 
@@ -223,7 +243,8 @@ int main(int argc, char** argv)
       }
 
       // save the ciphertext to the output file
-      output_file << decrypted_ciphertext;
+      //output_file << decrypted_ciphertext;
+      output_file << plaintext;
     }
     else {
       cerr << "invalid ENC/DEC option: " << argv[kEncryptionOrDecryption];
