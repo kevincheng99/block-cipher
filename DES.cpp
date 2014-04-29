@@ -95,13 +95,30 @@ string DES::encrypt(const string& plaintext)
 	
 	string ptext = plaintext;
 	
+  int number_of_padding = 0;
+
 	while (ptext.size() < 8)
 	{
 		ptext.append("0");
+    number_of_padding++;
 	}
 	
-	
-	
+  // convert int to a character in ASCII
+  char number_of_padding_char = '0' + number_of_padding;
+  
+  /**
+   * put the number of padding at the end of padded plaintext block
+   * pad only one zero may be a special case?
+   * std::string.back() should not be used on the empty string
+   * it's important to do the bound checking when dealing with end of string
+   * we will remove the padding in the cipher.cpp
+   */
+  if (number_of_padding > 0) {
+    size_t last_index = ptext.length() - 1;
+    ptext.at(last_index) = number_of_padding_char;
+  }
+
+
 	DES_LONG block[2];
 	
 	//Convert C++ string to c-string
