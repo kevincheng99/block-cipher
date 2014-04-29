@@ -189,7 +189,7 @@ string DES::decrypt(const string& ciphertext)
 	char cstr2[4];
 
 	ciphertext.copy(cstr1, 4, 0);
-	cstr2[4] = '\0';
+	cstr1[4] = '\0';
 
 	ciphertext.copy(cstr2, 4, 4);
 	cstr2[4] = '\0';
